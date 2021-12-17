@@ -210,4 +210,76 @@ class Lexer(object):
 				"Label name cannot contain whitespace characters."
 			)
 
-		# we'll continued it later.. :))
+		if self.token[-1] != ':' and \
+		   (len(self.token_objects) == 0 and self.token_objects[-1].get_type() != n.MNEMONIC):
+			raise LexedEntityError("Label name must ended by colon.")
+
+		self.token = self.token[:(-1 if self.token[-1] == ':' else len(self.token))]
+		self.add_node(node.Label(self.token))
+
+	"""
+	"""
+	def _process_mnemonic(self):
+		self.add_node(node.Mnemonic(self.token))
+
+	"""
+	"""
+	def _process_newline(self):
+		self.add_node(node.Newline(self.token))
+
+	"""
+	"""
+	def _process_comment_line(self):
+		while True:
+			if self._is_eof():
+				break
+
+			if self._current() == t.NEWLINE:
+				self.token = self._current()
+				break
+
+			# ignore the current token except newline
+			# because this is in the scope of comment
+			# section.
+			self._next()
+
+		if self.token == t.NEWLINE:
+			self._process_newline()
+
+	"""
+	"""
+	def _process_register(self):
+		self.add_node(node.Register(self.token))
+
+	"""
+	"""
+	def _process_when_eof(self):
+		if self._is_valid_insn(self.token):
+			self._process_mnemonic()
+
+		if self._is_valid_reg(self.token):
+			self._process_register()
+
+	"""
+	"""
+	def _get_valid_insns(self):
+		return [
+			"movb", "addb", "subb", "mulb",
+			"divb", "prib",
+			"jmp"
+		]
+
+	"""
+	"""
+	def _is_valid_insn(self, insn):
+		return insn in self._get_valid_insns()
+
+	"""
+	"""
+	def _get_valid_regs(self):
+		return ["r0", "r1", "r2", "r3"]
+
+	"""
+	"""
+	def _is_valid_reg(self, reg):
+		return reg in self._get_valid_regs()

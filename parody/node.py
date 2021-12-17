@@ -29,103 +29,70 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-Lexing class, objects, and properties.
+Node object representation.
 """
 
-import parody.token_kind as t
+import parody.node_kind as n
+from abc import ABC, abstractmethod
 
-class Lexer(object):
+class AbstractNode(ABC):
 	def __init__(self):
-		self.input         = ''
-		self.token         = ''
-		self.position      = 0
-		self.is_negative   = False
-		self.token_objects = []
+		self.value  = None
+		self.childs = []
 
 	"""
 	"""
-	def lex(buffer):
-		self.input = buffer
-
-		while True:
-			if self._is_eof():
-				self._process_when_eof()
-				break
-
-			if self.token == t.SPACE or \
-			   self.token == t.TAB:
-				self.token = ''
-				continue
-
-			if self.token == t.NEWLINE:
-				self._process_newline()
-				self.token = ''
-				continue
-
-			if self.token == t.START_COMMENT_LINE:
-				self._process_comment_line()
-				self.token = ''
-				continue
-
-			if self.token == t.COMMA:
-				self._process_comma()
-				self.token = ''
-				continue
-
-			if self.token == t.PREFIX_NUM:
-				self._process_integer()
-				self.token = ''
-				continue
-
-			if self.token == t.START_LABEL:
-				self._process_label()
-				self.token = ''
-				continue
-
-			if self._is_valid_instruction(self.token):
-				self._process_mnemonic()
-				self.token = ''
-				continue
-
-			if self._is_valid_register(self.token):
-				self._process_register()
-				self.token = ''
-				continue
-
-			self.token += self._current()
-			self._next()
+	def get_value(self):
+		return self.value
 
 	"""
 	"""
-	def get_token_objects(self):
-		return self.token_objects
+	def set_value(self, value):
+		self.value = value
 
 	"""
 	"""
-	def add_node(self, node):
-		self.token_objects.append(node)
+	@abstractmethod
+	def get_name(self):
+		pass
 
 	"""
 	"""
-	def _next(self):
-		self.position += 1
+	@abstractmethod
+	def get_type(self):
+		pass
+
+class Comma(AbstractNode):
+	"""
+	"""
+	def get_name(self):
+		return '<comma>'
 
 	"""
 	"""
-	def _prev(self):
-		self.position -= 1
+	def get_type(self):
+		return n.COMMA
+
+class Label(AbstractNode):
+	"""
+	"""
+	def get_name(self):
+		return '<label>'
 
 	"""
 	"""
-	def _current(self):
-		return self.input[self.position]
+	def get_type(self):
+		return n.LABEL
+
+class Mnemonic(AbstractNode):
+	"""
+	"""
+	def get_name(self):
+		return '<mnemonic>'
 
 	"""
 	"""
-	def _peek(self):
-		return self.input[self.position + 1]
+	def get_type(self):
+		return n.MNEMONIC
 
-	"""
-	"""
-	def _is_eof(self):
-		return self.position >= len(self.input)
+# we'll continued it later, loser.. :))

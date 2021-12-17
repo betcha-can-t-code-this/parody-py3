@@ -29,101 +29,17 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-Node object representation.
+Exceptions.
 """
 
-import parody.node_kind as n
-from abc import ABC, abstractmethod
+class AstError(Exception):
+	pass
 
-class AbstractNode(ABC):
-	def __init__(self):
-		self.value  = None
-		self.childs = []
+class LexedEntityError(Exception):
+	pass
 
-	"""
-	"""
-	def get_value(self):
-		return self.value
+class RuntimeError(Exception):
+	pass
 
-	"""
-	"""
-	def set_value(self, value):
-		self.value = value
-
-	"""
-	"""
-	@abstractmethod
-	def get_name(self):
-		pass
-
-	"""
-	"""
-	@abstractmethod
-	def get_type(self):
-		pass
-
-class Comma(AbstractNode):
-	"""
-	"""
-	def get_name(self):
-		return '<comma>'
-
-	"""
-	"""
-	def get_type(self):
-		return n.COMMA
-
-class Label(AbstractNode):
-	"""
-	"""
-	def get_name(self):
-		return '<label>'
-
-	"""
-	"""
-	def get_type(self):
-		return n.LABEL
-
-class Mnemonic(AbstractNode):
-	"""
-	"""
-	def get_name(self):
-		return '<mnemonic>'
-
-	"""
-	"""
-	def get_type(self):
-		return n.MNEMONIC
-
-class Newline(AbstractNode):
-	"""
-	"""
-	def get_name(self):
-		return '<newline>'
-
-	"""
-	"""
-	def get_type(self):
-		return n.NEWLINE
-
-class Number(AbstractNode):
-	"""
-	"""
-	def get_name(self):
-		return '<number>'
-
-	"""
-	"""
-	def get_type(self):
-		return n.NUMBER
-
-class Register(AbstractNode):
-	"""
-	"""
-	def get_name(self):
-		return '<register>'
-
-	"""
-	"""
-	def get_type(self):
-		return n.REGISTER
+class SyntaxError(Exception):
+	pass

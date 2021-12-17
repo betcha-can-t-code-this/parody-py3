@@ -33,6 +33,11 @@ Lexing class, objects, and properties.
 """
 
 import parody.token_kind as t
+import parody.node_kind as n
+import parody.node as node
+
+from parody.exceptions import SyntaxError as ParodySyntaxError
+from parody.exceptions import LexedEntityError
 
 class Lexer(object):
 	def __init__(self):
@@ -129,3 +134,80 @@ class Lexer(object):
 	"""
 	def _is_eof(self):
 		return self.position >= len(self.input)
+
+	"""
+	"""
+	def _process_comma(self):
+		self.add_node(node.Comma(self.token))
+
+	"""
+	"""
+	def _process_integer(self):
+		try:
+			self.input[self.position]
+		except IndexError as e:
+			raise ParodySyntaxError(
+				"Syntax error, '#' must be followed by number " + \
+				"(either positive/negative) or +/- sign then followed by number."
+			)
+
+		self.token       = ''
+		self.is_negative = True if self._current() == '-' else False
+
+		if self.is_negative == True:
+			self._next()
+
+		exists = True
+
+		try:
+			self.input[self.position]
+		except IndexError as e:
+			exists = False
+
+		if self.is_negative == True and exists == False:
+			raise ParodySyntaxError(
+				"Syntax error, '-' must be followed by decimal digit."
+			)
+
+		while True:
+			try:
+				self.input[self.position]
+			except IndexError as e:
+				break
+
+			if self._current().isnumeric() == True \
+			   self._current() == t.COMMA:
+				break
+
+			self.token += self._current()
+			self._next()
+
+		self.add_node(
+			node.Number(
+				int(self.token) * -1 if self.is_negative == True else int(self.token)
+			)
+		)
+
+	"""
+	"""
+	def _process_label(self):
+		exception = False
+
+		while True:
+			if self._is_eof() or \
+			   self._current() == t.NEWLINE:
+				break
+
+			if self._current() == t.SPACE:
+				exception = True
+				break
+
+			self.token += self._current()
+			self._next()
+
+		if exception == True:
+			raise LexedEntityError(
+				"Label name cannot contain whitespace characters."
+			)
+
+		# we'll continued it later.. :))

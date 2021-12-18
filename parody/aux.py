@@ -29,126 +29,15 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-Node object representation.
+Auxiliary helper.
 """
 
-import parody.node_kind as n
-from abc import ABC, abstractmethod
+from pprint import pprint
 
-class AbstractNode(ABC):
-    def __init__(self, value):
-        self.value = value
-        self.childs = []
+"""
+"""
+def ast_traverser(ast):
+	pprint(ast)
 
-    """
-	"""
-
-    def get_value(self):
-        return self.value
-
-    """
-	"""
-
-    def set_value(self, value):
-        self.value = value
-
-    """
-	"""
-
-    @abstractmethod
-    def get_name(self):
-        pass
-
-    """
-	"""
-
-    @abstractmethod
-    def get_type(self):
-        pass
-
-    """
-    """
-    def __repr__(self):
-        return repr(self.get_value())
-
-    """
-    """
-    def __str__(self):
-        return str(self.get_value())
-
-class Comma(AbstractNode):
-    """ """
-
-    def get_name(self):
-        return "<comma>"
-
-    """
-	"""
-
-    def get_type(self):
-        return n.COMMA
-
-
-class Label(AbstractNode):
-    """ """
-
-    def get_name(self):
-        return "<label>"
-
-    """
-	"""
-
-    def get_type(self):
-        return n.LABEL
-
-
-class Mnemonic(AbstractNode):
-    """ """
-
-    def get_name(self):
-        return "<mnemonic>"
-
-    """
-	"""
-
-    def get_type(self):
-        return n.MNEMONIC
-
-
-class Newline(AbstractNode):
-    """ """
-
-    def get_name(self):
-        return "<newline>"
-
-    """
-	"""
-
-    def get_type(self):
-        return n.NEWLINE
-
-
-class Number(AbstractNode):
-    """ """
-
-    def get_name(self):
-        return "<number>"
-
-    """
-	"""
-
-    def get_type(self):
-        return n.NUMBER
-
-
-class Register(AbstractNode):
-    """ """
-
-    def get_name(self):
-        return "<register>"
-
-    """
-	"""
-
-    def get_type(self):
-        return n.REGISTER
+	for child in ast.get_childs():
+		ast_traverser(child)

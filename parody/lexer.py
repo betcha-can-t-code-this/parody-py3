@@ -51,8 +51,8 @@ class Lexer(object):
     """
 	"""
 
-    def lex(buffer):
-        self.input = buffer
+    def lex(self, buffer):
+        self.input = buffer.decode()
 
         while True:
             if self._is_eof():
@@ -88,12 +88,12 @@ class Lexer(object):
                 self.token = ""
                 continue
 
-            if self._is_valid_instruction(self.token):
+            if self._is_valid_insn(self.token):
                 self._process_mnemonic()
                 self.token = ""
                 continue
 
-            if self._is_valid_register(self.token):
+            if self._is_valid_reg(self.token):
                 self._process_register()
                 self.token = ""
                 continue
@@ -223,7 +223,7 @@ class Lexer(object):
         ):
             raise LexedEntityError("Label name must ended by colon.")
 
-        self.token = self.token[: (-1 if self.token[-1] == ":" else len(self.token))]
+        self.token = self.token[1: (-1 if self.token[-1] == ":" else len(self.token))]
         self.add_node(node.Label(self.token))
 
     """

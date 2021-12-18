@@ -62,10 +62,10 @@ class Parser(object):
             if self._is_eof():
                 break
 
-            if self._current().get_type() == node.LABEL:
+            if self._current().get_type() == n.LABEL:
                 self._process_label()
 
-            if self._current().get_type() == node.MNEMONIC:
+            if self._current().get_type() == n.MNEMONIC:
                 self._process_instruction_line()
 
             self._next()
@@ -161,15 +161,15 @@ class Parser(object):
 
         self._run_instruction_line_validator(tmp)
 
-        ast = ast.Ast(a.AST_INSTRUCTION_LINE, None)
+        child = ast.Ast(a.AST_INSTRUCTION_LINE, None)
 
         for el in tmp:
             if el.get_type() == n.COMMA:
                 continue
 
-            ast.add_child(ast.Ast(self._determine_node_type(el), el))
+            child.add_child(ast.Ast(self._determine_node_type(el), el))
 
-        self.ast.add_child(ast)
+        self.ast.add_child(child)
 
     """
 	"""

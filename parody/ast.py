@@ -32,6 +32,7 @@
 AST objects, methods, and related-operations.
 """
 
+import parody.ast_kind as a
 
 class Ast(object):
     def __init__(self, ast_type, value):
@@ -89,3 +90,27 @@ class Ast(object):
 
     def add_child(self, child):
         self.childs.append(child)
+
+    """
+    """
+    def _type_to_string_resolver(self, ast_type):
+        if ast_type == a.AST_ROOT:
+            return '<root>'
+        elif ast_type == a.AST_MNEMONIC:
+            return '<mnemonic>'
+        elif ast_type == a.AST_REGISTER:
+            return '<register>'
+        elif ast_type == a.AST_INTEGER_VALUE:
+            return '<integer>'
+        elif ast_type == a.AST_INSTRUCTION_LINE:
+            return '<instruction-line>'
+        elif ast_type == a.AST_LABEL:
+            return '<label>'
+
+    """
+    """
+    def __repr__(self):
+        return '%s (%s)' % (
+            self._type_to_string_resolver(self.get_type()),
+            '<nil>' if self.get_value() == None else self.get_value()
+        )

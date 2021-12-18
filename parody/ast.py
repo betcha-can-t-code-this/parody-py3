@@ -32,51 +32,60 @@
 AST objects, methods, and related-operations.
 """
 
+
 class Ast(object):
-	def __init__(self, ast_type, value):
-		self.value  = value
-		self.type   = ast_type
-		self.childs = []
+    def __init__(self, ast_type, value):
+        self.value = value
+        self.type = ast_type
+        self.childs = []
 
+    """
 	"""
-	"""
-	def get_value(self):
-		return self.value
 
-	"""
-	"""
-	def set_value(self, value):
-		self.value = value
+    def get_value(self):
+        return self.value
 
+    """
 	"""
-	"""
-	def get_type(self):
-		return self.type
 
-	"""
-	"""
-	def set_type(self, ast_type):
-		self.type = ast_type
+    def set_value(self, value):
+        self.value = value
 
+    """
 	"""
-	"""
-	def get_child_at(self, index):
-		try:
-			return self.childs[index]
-		except IndexError as e
-			return None
 
-	"""
-	"""
-	def get_childs(self):
-		return self.childs
+    def get_type(self):
+        return self.type
 
+    """
 	"""
-	"""
-	def set_childs(self, childs):
-		self.childs = childs
 
+    def set_type(self, ast_type):
+        self.type = ast_type
+
+    """
 	"""
+
+    def get_child_at(self, index):
+        try:
+            return self.childs[index]
+        except IndexError as e:
+            return None
+
+    """
 	"""
-	def add_child(self, child):
-		self.childs.append(child)
+
+    def get_childs(self):
+        return self.childs
+
+    """
+	"""
+
+    def set_childs(self, childs):
+        self.childs = childs
+
+    """
+	"""
+
+    def add_child(self, child):
+        self.childs.append(child)

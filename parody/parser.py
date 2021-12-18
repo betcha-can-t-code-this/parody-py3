@@ -37,245 +37,270 @@ import parody.ast_kind as a
 import parody.exceptions as ex
 import parody.node_kind as n
 
+
 class Parser(object):
-	def __init__(self, lexer):
-		self.token = None
-		self.input = None
-		self.position = 0
-		self.line = 0
-		self.lexer = lexer
-		self.ast = ast.Ast(a.AST_ROOT, None)
+    def __init__(self, lexer):
+        self.token = None
+        self.input = None
+        self.position = 0
+        self.line = 0
+        self.lexer = lexer
+        self.ast = ast.Ast(a.AST_ROOT, None)
 
+    """
 	"""
-	"""
-	def parse(self, buffer):
-		try:
-			self.lexer.lex(buffer)
-		except ex.AbstractParodyError as e:
-			raise e
 
-		self.input = self.lexer.get_token_objects()
+    def parse(self, buffer):
+        try:
+            self.lexer.lex(buffer)
+        except ex.AbstractParodyError as e:
+            raise e
 
-		while True:
-			if self._is_eof():
-				break
+        self.input = self.lexer.get_token_objects()
 
-			if self._current().get_type() == node.LABEL:
-				self._process_label()
+        while True:
+            if self._is_eof():
+                break
 
-			if self._current().get_type() == node.MNEMONIC:
-				self._process_instruction_line()
+            if self._current().get_type() == node.LABEL:
+                self._process_label()
 
-			self._next()
+            if self._current().get_type() == node.MNEMONIC:
+                self._process_instruction_line()
 
-	"""
-	"""
-	def get_lexer(self):
-		return self.lexer
+            self._next()
 
+    """
 	"""
-	"""
-	def set_lexer(self, lexer):
-		self.lexer = lexer
 
-	"""
-	"""
-	def get_input(self):
-		return self.input
+    def get_lexer(self):
+        return self.lexer
 
+    """
 	"""
-	"""
-	def set_input(self, input):
-		self.input = input
 
-	"""
-	"""
-	def get_ast(self):
-		return self.ast
+    def set_lexer(self, lexer):
+        self.lexer = lexer
 
+    """
 	"""
+
+    def get_input(self):
+        return self.input
+
+    """
 	"""
-	def set_ast(self, ast):
-		self.ast = ast
 
+    def set_input(self, input):
+        self.input = input
+
+    """
 	"""
+
+    def get_ast(self):
+        return self.ast
+
+    """
 	"""
-	def _current(self):
-		return self.input[self.position]
 
+    def set_ast(self, ast):
+        self.ast = ast
+
+    """
 	"""
+
+    def _current(self):
+        return self.input[self.position]
+
+    """
 	"""
-	def _next(self):
-		self.position += 1
 
+    def _next(self):
+        self.position += 1
+
+    """
 	"""
+
+    def _prev(self):
+        self.position -= 1
+
+    """
 	"""
-	def _prev(self):
-		self.position -= 1
 
+    def _is_eof(self):
+        return self.position >= len(self.input)
+
+    """
 	"""
+
+    def _process_label(self):
+        self.ast.add_child(ast.Ast(a.AST_LABEL, self._current()))
+
+    """
 	"""
-	def _is_eof(self):
-		return self.position >= len(self.input)
 
+    def _process_instruction_line(self):
+        tmp = []
+
+        while True:
+            if self._is_eof():
+                break
+
+            if self._current().get_type() == n.NEWLINE:
+                self.line += 1
+                break
+
+            tmp.append(self._current())
+            self._next()
+
+        if len(tmp) == 0:
+            return
+
+        if tmp[0].get_type() != n.MNEMONIC:
+            raise SyntaxError("Instruction line must be prefixed by valid mnemonic.")
+
+        self._run_instruction_line_validator(tmp)
+
+        ast = ast.Ast(a.AST_INSTRUCTION_LINE, None)
+
+        for el in tmp:
+            if el.get_type() == n.COMMA:
+                continue
+
+            ast.add_child(ast.Ast(self._determine_node_type(el), el))
+
+        self.ast.add_child(ast)
+
+    """
 	"""
+
+    def _validate_binary_movb_instruction(self, insn):
+        if insn[0].get_value() == "movb" and insn[3].get_type() == n.NUMBER:
+            raise SyntaxError(
+                "Number cannot be placed in second operand when it's mnemonic "
+                + " is 'movb' (line: %d)." % (self.line)
+            )
+
+        if insn[0].get_value() == "movb" and (
+            (insn[1].get_type() != n.REGISTER or insn[1].get_type() != n.NUMBER)
+            and insn[3].get_type() != n.REGISTER
+        ):
+            raise SyntaxError(
+                "First operand must be register or numeric constant, and second operand "
+                + "must be register (line: %d)." % (self.line)
+            )
+
+    """
 	"""
-	def _process_label(self):
-		self.ast.add_child(ast.Ast(a.AST_LABEL, self._current()))
 
+    def _validate_binary_addb_instruction(self, insn):
+        if insn[0].get_value() == "addb" and insn[3].get_type() == n.NUMBER:
+            raise SyntaxError(
+                "Number cannot be placed in second operand when it's mnemonic is "
+                + "'addb' (line: %d)." % (self.line)
+            )
+
+        if insn[0].get_value() == "addb" and (
+            (insn[1].get_type() != n.REGISTER or insn[1].get_type() != n.NUMBER)
+            and insn[3].get_type() != n.REGISTER
+        ):
+            raise SyntaxError(
+                "First operand must be register or numeric constant, and second operand "
+                + "must be register (line: %d)." % (self.line)
+            )
+
+    """
 	"""
+
+    def _validate_binary_subb_instruction(self, insn):
+        if insn[0].get_value() == "subb" and insn[3].get_type() == n.NUMBER:
+            raise SyntaxError(
+                "Number cannot be placed in second operand when it's mnemonic is "
+                + "'subb' (line: %d)." % (self.line)
+            )
+
+        if insn[0].get_value() == "subb" and (
+            (insn[1].get_type() != n.REGISTER or insn[1].get_type() != n.NUMBER)
+            and insn[3].get_type() != n.REGISTER
+        ):
+            raise SyntaxError(
+                "First operand must be register or numeric constant, and second operand "
+                + "must be register (line: %d)." % (self.line)
+            )
+
+    """
 	"""
-	def _process_instruction_line(self):
-		tmp = []
 
-		while True:
-			if self._is_eof():
-				break
+    def _validate_binary_mulb_instruction(self, insn):
+        if insn[0].get_value() == "mulb" and insn[3].get_type() == n.NUMBER:
+            raise SyntaxError(
+                "Number cannot be placed in second operand when it's mnemonic is "
+                + "'mulb' (line: %d)." % (self.line)
+            )
 
-			if self._current().get_type() == n.NEWLINE:
-				self.line++
-				break
+        if insn[0].get_value() == "mulb" and (
+            (insn[1].get_type() != n.REGISTER or insn[1].get_type() != n.NUMBER)
+            and insn[3].get_type() != n.REGISTER
+        ):
+            raise SyntaxError(
+                "First operand must be register or numeric constant, and second operand "
+                + "must be register (line: %d)." % (self.line)
+            )
 
-			tmp.append(self._current())
-			self._next()
-
-		if len(tmp) == 0:
-			return
-
-		if tmp[0].get_type() != n.MNEMONIC:
-			raise SyntaxError(
-				"Instruction line must be prefixed by valid mnemonic."
-			)
-
-		self._run_instruction_line_validator(tmp)
-
-		ast = ast.Ast(a.AST_INSTRUCTION_LINE, None)
-
-		for el in tmp:
-			if el.get_type() == n.COMMA:
-				continue
-
-			ast.add_child(ast.Ast(self._determine_node_type(el), el))
-
-		self.ast.add_child(ast)
-
+    """
 	"""
-	"""
-	def _validate_binary_movb_instruction(self, insn):
-		if insn[0].get_value() == "movb" and \
-		   insn[3].get_type() == n.NUMBER:
-			raise SyntaxError(
-				'Number cannot be placed in second operand when it\'s mnemonic ' + \
-				' is \'movb\' (line: %d).' % (self.line)
-			)
 
-		if insn[0].get_value() == "movb" and \
-		   ((insn[1].get_type() != n.REGISTER or insn[1].get_type() != n.NUMBER) and \
-		   	insn[3].get_type() != n.REGISTER):
-			raise SyntaxError(
-				'First operand must be register or numeric constant, and second operand ' + \
-				'must be register (line: %d).' % (self.line)
-			)
+    def _validate_binary_divb_instruction(self, insn):
+        if insn[0].get_value() == "divb" and insn[3].get_type() == n.NUMBER:
+            raise SyntaxError(
+                "Number cannot be placed in second operand when it's mnemonic is "
+                + "'mulb' (line: %d)." % (self.line)
+            )
 
-	"""
-	"""
-	def _validate_binary_addb_instruction(self, insn):
-		if insn[0].get_value() == "addb" and insn[3].get_type() == n.NUMBER:
-			raise SyntaxError(
-				'Number cannot be placed in second operand when it\'s mnemonic is ' + \
-				'\'addb\' (line: %d).' % (self.line)
-			)
+        if insn[0].get_value() == "divb" and (
+            (insn[1].get_type() != n.REGISTER or insn[1].get_type() != n.NUMBER)
+            and insn[3].get_type() != n.REGISTER
+        ):
+            raise SyntaxError(
+                "First operand must be register or numeric constant, and second operand "
+                + "must be register (line: %d)." % (self.line)
+            )
 
-		if insn[0].get_value() == "addb" and \
-		   ((insn[1].get_type() != n.REGISTER or insn[1].get_type() != n.NUMBER) and \
-		   	insn[3].get_type() != n.REGISTER):
-			raise SyntaxError(
-				'First operand must be register or numeric constant, and second operand ' + \
-				'must be register (line: %d).' % (self.line)
-			)
+    """
+	"""
 
-	"""
-	"""
-	def _validate_binary_subb_instruction(self, insn):
-		if insn[0].get_value() == "subb" and insn[3].get_type() == n.NUMBER:
-			raise SyntaxError(
-				'Number cannot be placed in second operand when it\'s mnemonic is ' + \
-				'\'subb\' (line: %d).' % (self.line)
-			)
+    def _validate_binary_prib_instruction(self, insn):
+        if insn[0].get_value() == "prib" and (
+            insn[1].get_type() != n.NUMBER and insn[1].get_type() != n.REGISTER
+        ):
+            raise SyntaxError(
+                "'prib' instruction must be followed by register name or number."
+            )
 
-		if insn[0].get_value() == "subb" and \
-		   ((insn[1].get_type() != n.REGISTER or insn[1].get_type() != n.NUMBER) and \
-		   	insn[3].get_type() != n.REGISTER):
-			raise SyntaxError(
-				'First operand must be register or numeric constant, and second operand ' + \
-				'must be register (line: %d).' % (self.line)
-			)
+    """
+	"""
 
-	"""
-	"""
-	def _validate_binary_mulb_instruction(self, insn):
-		if insn[0].get_value() == "mulb" and insn[3].get_type() == n.NUMBER:
-			raise SyntaxError(
-				'Number cannot be placed in second operand when it\'s mnemonic is ' + \
-				'\'mulb\' (line: %d).' % (self.line)
-			)
+    def _run_instruction_line_validator(self, insn):
+        ilen = len(insn)
 
-		if insn[0].get_value() == "mulb" and \
-		   ((insn[1].get_type() != n.REGISTER or insn[1].get_type() != n.NUMBER) and \
-		   	insn[3].get_type() != n.REGISTER):
-			raise SyntaxError(
-				'First operand must be register or numeric constant, and second operand ' + \
-				'must be register (line: %d).' % (self.line)
-			)
+        if ilen == 2:
+            self._validate_binary_prib_instruction(insn)
+        elif ilen == 4:
+            self._validate_binary_movb_instruction(insn)
+            self._validate_binary_addb_instruction(insn)
+            self._validate_binary_subb_instruction(insn)
+            self._validate_binary_mulb_instruction(insn)
+            self._validate_binary_divb_instruction(insn)
+        else:
+            raise SyntaxError("Unknown instruction.")
 
+    """
 	"""
-	"""
-	def _validate_binary_divb_instruction(self, insn):
-		if insn[0].get_value() == "divb" and insn[3].get_type() == n.NUMBER:
-			raise SyntaxError(
-				'Number cannot be placed in second operand when it\'s mnemonic is ' + \
-				'\'mulb\' (line: %d).' % (self.line)
-			)
 
-		if insn[0].get_value() == "divb" and \
-		   ((insn[1].get_type() != n.REGISTER or insn[1].get_type() != n.NUMBER) and \
-		   	insn[3].get_type() != n.REGISTER):
-			raise SyntaxError(
-				'First operand must be register or numeric constant, and second operand ' + \
-				'must be register (line: %d).' % (self.line)
-			)
-
-	"""
-	"""
-	def _validate_binary_prib_instruction(self, insn):
-		if insn[0].get_value() == "prib" and \
-		   (insn[1].get_type() != n.NUMBER and insn[1].get_type() != n.REGISTER):
-			raise SyntaxError(
-				'\'prib\' instruction must be followed by register name or number.'
-			)
-
-	"""
-	"""
-	def _run_instruction_line_validator(self, insn):
-		ilen = len(insn)
-
-		if ilen == 2:
-			self._validate_binary_prib_instruction(insn)
-		elif ilen == 4:
-			self._validate_binary_movb_instruction(insn)
-			self._validate_binary_addb_instruction(insn)
-			self._validate_binary_subb_instruction(insn)
-			self._validate_binary_mulb_instruction(insn)
-			self._validate_binary_divb_instruction(insn)
-		else:
-			raise SyntaxError('Unknown instruction.')
-
-	"""
-	"""
-	def _determine_node_type(self, val):
-		if val.get_type() == n.MNEMONIC:
-			return a.AST_MNEMONIC
-		elif val.get_type() == n.REGISTER:
-			return a.AST_REGISTER
-		elif val.get_type() == n.NUMBER:
-			return a.AST_INTEGER_VALUE
+    def _determine_node_type(self, val):
+        if val.get_type() == n.MNEMONIC:
+            return a.AST_MNEMONIC
+        elif val.get_type() == n.REGISTER:
+            return a.AST_REGISTER
+        elif val.get_type() == n.NUMBER:
+            return a.AST_INTEGER_VALUE

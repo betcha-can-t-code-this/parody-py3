@@ -32,11 +32,11 @@
 Lexer token kind.
 """
 
-SPACE = ' '
+SPACE = " "
 NEWLINE = "\n"
 TAB = "\t"
-START_COMMENT_LINE = '%'
-COMMA = ','
-PREFIX_NUM = '#'
-START_LABEL = '@'
-COLON = ':'
+START_COMMENT_LINE = "%"
+COMMA = ","
+PREFIX_NUM = "#"
+START_LABEL = "@"
+COLON = ":"

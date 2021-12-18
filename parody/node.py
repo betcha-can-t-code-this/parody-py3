@@ -35,95 +35,112 @@ Node object representation.
 import parody.node_kind as n
 from abc import ABC, abstractmethod
 
+
 class AbstractNode(ABC):
-	def __init__(self):
-		self.value  = None
-		self.childs = []
+    def __init__(self):
+        self.value = None
+        self.childs = []
 
+    """
 	"""
-	"""
-	def get_value(self):
-		return self.value
 
-	"""
-	"""
-	def set_value(self, value):
-		self.value = value
+    def get_value(self):
+        return self.value
 
+    """
 	"""
-	"""
-	@abstractmethod
-	def get_name(self):
-		pass
 
+    def set_value(self, value):
+        self.value = value
+
+    """
 	"""
+
+    @abstractmethod
+    def get_name(self):
+        pass
+
+    """
 	"""
-	@abstractmethod
-	def get_type(self):
-		pass
+
+    @abstractmethod
+    def get_type(self):
+        pass
+
 
 class Comma(AbstractNode):
-	"""
-	"""
-	def get_name(self):
-		return '<comma>'
+    """ """
 
+    def get_name(self):
+        return "<comma>"
+
+    """
 	"""
-	"""
-	def get_type(self):
-		return n.COMMA
+
+    def get_type(self):
+        return n.COMMA
+
 
 class Label(AbstractNode):
-	"""
-	"""
-	def get_name(self):
-		return '<label>'
+    """ """
 
+    def get_name(self):
+        return "<label>"
+
+    """
 	"""
-	"""
-	def get_type(self):
-		return n.LABEL
+
+    def get_type(self):
+        return n.LABEL
+
 
 class Mnemonic(AbstractNode):
-	"""
-	"""
-	def get_name(self):
-		return '<mnemonic>'
+    """ """
 
+    def get_name(self):
+        return "<mnemonic>"
+
+    """
 	"""
-	"""
-	def get_type(self):
-		return n.MNEMONIC
+
+    def get_type(self):
+        return n.MNEMONIC
+
 
 class Newline(AbstractNode):
-	"""
-	"""
-	def get_name(self):
-		return '<newline>'
+    """ """
 
+    def get_name(self):
+        return "<newline>"
+
+    """
 	"""
-	"""
-	def get_type(self):
-		return n.NEWLINE
+
+    def get_type(self):
+        return n.NEWLINE
+
 
 class Number(AbstractNode):
-	"""
-	"""
-	def get_name(self):
-		return '<number>'
+    """ """
 
+    def get_name(self):
+        return "<number>"
+
+    """
 	"""
-	"""
-	def get_type(self):
-		return n.NUMBER
+
+    def get_type(self):
+        return n.NUMBER
+
 
 class Register(AbstractNode):
-	"""
-	"""
-	def get_name(self):
-		return '<register>'
+    """ """
 
+    def get_name(self):
+        return "<register>"
+
+    """
 	"""
-	"""
-	def get_type(self):
-		return n.REGISTER
+
+    def get_type(self):
+        return n.REGISTER

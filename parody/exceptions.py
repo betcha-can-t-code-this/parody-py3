@@ -32,17 +32,22 @@
 Exceptions.
 """
 
+
 class AbstractParodyError(Exception):
-	pass
+    pass
+
 
 class AstError(AbstractParodyError):
-	pass
+    pass
+
 
 class LexedEntityError(AbstractParodyError):
-	pass
+    pass
+
 
 class RuntimeError(AbstractParodyError):
-	pass
+    pass
+
 
 class SyntaxError(AbstractParodyError):
-	pass
+    pass

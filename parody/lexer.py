@@ -223,7 +223,7 @@ class Lexer(object):
         ):
             raise LexedEntityError("Label name must ended by colon.")
 
-        self.token = self.token[1: (-1 if self.token[-1] == ":" else len(self.token))]
+        self.token = self.token[1 : (-1 if self.token[-1] == ":" else len(self.token))]
         self.add_node(node.Label(self.token))
 
     """

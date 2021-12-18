@@ -35,6 +35,7 @@ Node object representation.
 import parody.node_kind as n
 from abc import ABC, abstractmethod
 
+
 class AbstractNode(ABC):
     def __init__(self, value):
         self.value = value
@@ -68,13 +69,16 @@ class AbstractNode(ABC):
 
     """
     """
+
     def __repr__(self):
         return repr(self.get_value())
 
     """
     """
+
     def __str__(self):
         return str(self.get_value())
+
 
 class Comma(AbstractNode):
     """ """

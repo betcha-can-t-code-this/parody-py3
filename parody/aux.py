@@ -36,8 +36,10 @@ from pprint import pprint
 
 """
 """
-def ast_traverser(ast):
-	pprint(ast)
 
-	for child in ast.get_childs():
-		ast_traverser(child)
+
+def ast_traverser(ast):
+    pprint(ast)
+
+    for child in ast.get_childs():
+        ast_traverser(child)
